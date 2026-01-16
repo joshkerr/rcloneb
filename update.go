@@ -171,6 +171,7 @@ func (m Model) updateFileBrowser(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			} else {
 				// Add single file to queue
 				m.queue.Add(m.currentRemote, f.FileItem)
+				return m, nil
 			}
 		}
 	case key.Matches(msg, m.keys.Left), key.Matches(msg, m.keys.Back):
@@ -186,8 +187,10 @@ func (m Model) updateFileBrowser(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if m.fileIndex >= 0 && m.fileIndex < len(files) {
 			m.toggleSelection()
 		}
+		return m, nil
 	case key.Matches(msg, m.keys.SelectAll):
 		m.selectAll()
+		return m, nil
 	case key.Matches(msg, m.keys.Filter):
 		m.filterMode = true
 		m.filterInput.Focus()
@@ -208,6 +211,7 @@ func (m Model) updateFileBrowser(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			m.state = StateQueueView
 			m.selectedIndex = 0
 		}
+		return m, nil
 	}
 
 	return m, nil
