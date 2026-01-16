@@ -47,14 +47,23 @@ func (m Model) remoteSelectView() string {
 	}
 
 	for i, remote := range m.remotes {
-		cursor := "  "
-		style := normalStyle
-		if i == m.selectedIndex {
-			cursor = cursorStyle.Render("> ")
-			style = selectedStyle
+		isSelected := i == m.selectedIndex
+
+		// Build line content with padding for bar effect
+		lineContent := " " + remote
+		lineWidth := m.width - 2
+		if lineWidth < 40 {
+			lineWidth = 40
 		}
-		b.WriteString(cursor)
-		b.WriteString(style.Render(remote))
+		if len(lineContent) < lineWidth {
+			lineContent += strings.Repeat(" ", lineWidth-len(lineContent))
+		}
+
+		if isSelected {
+			b.WriteString(selectedStyle.Render(lineContent))
+		} else {
+			b.WriteString(normalStyle.Render(lineContent))
+		}
 		b.WriteString("\n")
 	}
 
@@ -125,41 +134,45 @@ func (m Model) fileBrowserView() string {
 
 		for i := startIdx; i < endIdx; i++ {
 			f := files[i]
-			cursor := "  "
-			if i == m.fileIndex {
-				cursor = cursorStyle.Render("> ")
-			}
+			isSelected := i == m.fileIndex
 
 			// Selection checkbox
 			checkbox := "[ ] "
 			if f.Selected {
-				checkbox = checkedStyle.Render("[x] ")
+				checkbox = "[x] "
 			}
 
-			// File/dir styling
+			// File/dir name
 			name := f.Name
 			if f.IsDir {
-				name = dirStyle.Render(name + "/")
-			} else {
-				if i == m.fileIndex {
-					name = selectedStyle.Render(name)
-				} else {
-					name = fileStyle.Render(name)
-				}
+				name = name + "/"
 			}
 
 			// Size
 			size := ""
 			if !f.IsDir {
-				size = sizeStyle.Render(rclone.FormatSize(f.Size))
+				size = "  " + rclone.FormatSize(f.Size)
 			}
 
-			b.WriteString(cursor)
-			b.WriteString(checkbox)
-			b.WriteString(name)
-			if size != "" {
-				b.WriteString("  ")
-				b.WriteString(size)
+			// Build the full line content
+			lineContent := fmt.Sprintf(" %s%s%s", checkbox, name, size)
+
+			// Pad line to consistent width for full bar effect
+			lineWidth := m.width - 2
+			if lineWidth < 40 {
+				lineWidth = 40
+			}
+			if len(lineContent) < lineWidth {
+				lineContent += strings.Repeat(" ", lineWidth-len(lineContent))
+			}
+
+			// Apply styling based on selection
+			if isSelected {
+				b.WriteString(selectedStyle.Render(lineContent))
+			} else if f.IsDir {
+				b.WriteString(dirStyle.Render(lineContent))
+			} else {
+				b.WriteString(fileStyle.Render(lineContent))
 			}
 			b.WriteString("\n")
 		}
@@ -208,25 +221,37 @@ func (m Model) queueView() string {
 
 	for i := startIdx; i < endIdx; i++ {
 		item := items[i]
-		cursor := "  "
-		if i == m.selectedIndex {
-			cursor = cursorStyle.Render("> ")
-		}
+		isSelected := i == m.selectedIndex
 
 		name := item.Name
 		if item.IsDir {
-			name = dirStyle.Render(name + "/")
+			name = name + "/"
 		}
 
 		var sizeStr string
 		if item.IsDir {
-			sizeStr = sizeStyle.Render("[folder]")
+			sizeStr = "[folder]"
 		} else {
-			sizeStr = sizeStyle.Render(rclone.FormatSize(item.Size))
+			sizeStr = rclone.FormatSize(item.Size)
 		}
 
-		b.WriteString(cursor)
-		b.WriteString(queueItemStyle.Render(fmt.Sprintf("%s  %s  (%s)", name, sizeStr, item.Remote)))
+		// Build line content
+		lineContent := fmt.Sprintf(" %s  %s  (%s)", name, sizeStr, item.Remote)
+
+		// Pad line for bar effect
+		lineWidth := m.width - 2
+		if lineWidth < 40 {
+			lineWidth = 40
+		}
+		if len(lineContent) < lineWidth {
+			lineContent += strings.Repeat(" ", lineWidth-len(lineContent))
+		}
+
+		if isSelected {
+			b.WriteString(selectedStyle.Render(lineContent))
+		} else {
+			b.WriteString(normalStyle.Render(lineContent))
+		}
 		b.WriteString("\n")
 	}
 

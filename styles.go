@@ -23,10 +23,11 @@ var (
 			Background(lipgloss.Color("236")).
 			Padding(0, 1)
 
-	// Selected item style
+	// Selected item style (highlighted bar)
 	selectedStyle = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(accentColor)
+			Foreground(lipgloss.Color("255")).
+			Background(lipgloss.Color("62"))
 
 	// Normal item style
 	normalStyle = lipgloss.NewStyle().
