@@ -1,0 +1,19 @@
+# Binaries
+rcloneb
+rcloneb.exe
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test/temp files
+*.mkv
+*.mp4
+*.avi
